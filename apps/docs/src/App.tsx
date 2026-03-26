@@ -62,6 +62,7 @@ const demos = [
   {
     title: "Default",
     desc: "Dots compose the logo shape directly.",
+    options: {} as Record<string, unknown>,
   },
   {
     title: "Inverted",
@@ -90,11 +91,160 @@ const demos = [
   },
 ];
 
+function demoToCode(options: Record<string, unknown>): string {
+  const props = Object.entries(options)
+    .map(([k, v]) => {
+      if (v === true) return `  ${k}`;
+      if (typeof v === "string") return `  ${k}="${v}"`;
+      return `  ${k}={${JSON.stringify(v)}}`;
+    })
+    .join("\n");
+  return `<DitheredImage\n  src="/logo.png"${props ? "\n" + props : ""}\n/>`;
+}
+
+function DemoCard({
+  demo,
+  src,
+}: {
+  demo: (typeof demos)[number];
+  src: string;
+}) {
+  const [showCode, setShowCode] = useState(false);
+  const code = demoToCode(demo.options);
+
+  return (
+    <div className="demo-card">
+      <div className="demo-preview-wrap">
+        <button
+          className="demo-code-toggle"
+          onClick={() => setShowCode(!showCode)}
+          aria-label={showCode ? "Show preview" : "Show code"}
+          title={showCode ? "Show preview" : "Show code"}
+        >
+          {showCode ? (
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" /><path fillRule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clipRule="evenodd" /></svg>
+          ) : (
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path fillRule="evenodd" d="M6.28 5.22a.75.75 0 0 1 0 1.06L2.56 10l3.72 3.72a.75.75 0 0 1-1.06 1.06L.97 10.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Zm7.44 0a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L17.44 10l-3.72-3.72a.75.75 0 0 1 0-1.06ZM11.377 2.011a.75.75 0 0 1 .612.867l-2.5 14.5a.75.75 0 0 1-1.478-.255l2.5-14.5a.75.75 0 0 1 .866-.612Z" clipRule="evenodd" /></svg>
+          )}
+        </button>
+        {showCode ? (
+          <div className="demo-code-view">
+            <CodeBlock code={code} />
+          </div>
+        ) : (
+          <DitheredImage
+            src={src}
+            className="demo-canvas-wrap"
+            {...demo.options}
+          />
+        )}
+      </div>
+      <div className="demo-info">
+        <h3>{demo.title}</h3>
+        <p>{demo.desc}</p>
+      </div>
+    </div>
+  );
+}
+
+const elementDemos = [
+  {
+    title: "HTML element",
+    desc: 'A styled div wrapped in <Dither> with invert mode.',
+    options: { invert: true, gridSize: 170 } as Record<string, unknown>,
+    children: `<div className="card">
+  <div className="icon">D</div>
+  <strong>dithered-element</strong>
+  <span>This is a plain HTML element, dithered.</span>
+</div>`,
+    render: (
+      <div className="dither-demo-content">
+        <div className="dither-demo-icon">D</div>
+        <div className="dither-demo-text">
+          <strong>dithered-element</strong>
+          <span>This is a plain HTML element, dithered.</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    title: "Color preserved",
+    desc: "Element colors carried through to each dot.",
+    options: { gridSize: 200, preserveColors: true } as Record<string, unknown>,
+    children: `<div className="card">
+  <div className="gradient" />
+  <strong>Preserved colors</strong>
+  <span>Original colors from the element are kept.</span>
+</div>`,
+    render: (
+      <div className="dither-demo-content dither-demo-colorful">
+        <div className="dither-demo-gradient" />
+        <div className="dither-demo-text">
+          <strong>Preserved colors</strong>
+          <span>Original colors from the element are kept.</span>
+        </div>
+      </div>
+    ),
+  },
+];
+
+function elementDemoToCode(
+  options: Record<string, unknown>,
+  children: string
+): string {
+  const props = Object.entries(options)
+    .map(([k, v]) => {
+      if (v === true) return `  ${k}`;
+      if (typeof v === "string") return `  ${k}="${v}"`;
+      return `  ${k}={${JSON.stringify(v)}}`;
+    })
+    .join("\n");
+  const indent = children.replace(/^/gm, "  ");
+  return `<Dither\n${props}\n>\n${indent}\n</Dither>`;
+}
+
+function ElementDemoCard({ demo }: { demo: (typeof elementDemos)[number] }) {
+  const [showCode, setShowCode] = useState(false);
+  const code = elementDemoToCode(demo.options, demo.children);
+
+  return (
+    <div className="demo-card">
+      <div className="demo-preview-wrap">
+        <button
+          className="demo-code-toggle"
+          onClick={() => setShowCode(!showCode)}
+          aria-label={showCode ? "Show preview" : "Show code"}
+          title={showCode ? "Show preview" : "Show code"}
+        >
+          {showCode ? (
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" /><path fillRule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clipRule="evenodd" /></svg>
+          ) : (
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path fillRule="evenodd" d="M6.28 5.22a.75.75 0 0 1 0 1.06L2.56 10l3.72 3.72a.75.75 0 0 1-1.06 1.06L.97 10.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Zm7.44 0a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L17.44 10l-3.72-3.72a.75.75 0 0 1 0-1.06ZM11.377 2.011a.75.75 0 0 1 .612.867l-2.5 14.5a.75.75 0 0 1-1.478-.255l2.5-14.5a.75.75 0 0 1 .866-.612Z" clipRule="evenodd" /></svg>
+          )}
+        </button>
+        {showCode ? (
+          <div className="demo-code-view">
+            <CodeBlock code={code} />
+          </div>
+        ) : (
+          <Dither className="demo-canvas-wrap" {...demo.options}>
+            {demo.render}
+          </Dither>
+        )}
+      </div>
+      <div className="demo-info">
+        <h3>{demo.title}</h3>
+        <p>{demo.desc}</p>
+      </div>
+    </div>
+  );
+}
+
 const elementInstallCommands = {
-  npm: "npm install @dloss/dithered-element @dloss/dithered-image",
-  yarn: "yarn add @dloss/dithered-element @dloss/dithered-image",
-  pnpm: "pnpm add @dloss/dithered-element @dloss/dithered-image",
-  bun: "bun add @dloss/dithered-element @dloss/dithered-image",
+  npm: "npm install @dloss/dithered-element",
+  yarn: "yarn add @dloss/dithered-element",
+  pnpm: "pnpm add @dloss/dithered-element",
+  bun: "bun add @dloss/dithered-element",
 };
 
 const elementUsageExamples = {
@@ -164,43 +314,47 @@ function App() {
         <DitheredImage src={currentSrc} className="hero-canvas" preserveColors />
         <h1>dither</h1>
         <p>
-          Interactive dithered image effect for the web. Any image becomes a
-          stipple field with cursor repulsion and click shockwaves. Vanilla JS
-          core, React bindings included.
+          Interactive dithered dot effects for the web. Turn any image or
+          DOM element into a stipple field with cursor repulsion and
+          click shockwaves.
         </p>
-        <div className="hero-badges">
-          <span className="badge">~4 KB gzipped</span>
-          <span className="badge">0 dependencies</span>
-          <span className="badge">Canvas 2D</span>
-          <span className="badge">React / Vanilla</span>
-        </div>
         <div className="hero-links">
           <a href="https://github.com/mikedloss/dither" target="_blank" rel="noopener noreferrer" className="hero-link">
             <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" /></svg>
             GitHub
           </a>
-          <a href="https://www.npmjs.com/package/@dloss/dithered-image" target="_blank" rel="noopener noreferrer" className="hero-link">
-            <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M0 0v16h16V0H0zm13 13h-2V5H8v8H3V3h10v10z" /></svg>
-            npm
-          </a>
         </div>
       </section>
 
-      {/* Install */}
+      {/* ── @dloss/dithered-image ── */}
       <section className="section">
         <div className="section-header">
-          <h2>Quick start</h2>
+          <h2>@dloss/dithered-image</h2>
+          <p>
+            Dither any image. Works with vanilla JS or React.
+            Zero runtime dependencies.
+          </p>
+          <div className="section-badges">
+            <span className="badge">~4 KB gzipped</span>
+            <span className="badge">0 dependencies</span>
+            <span className="badge">Canvas 2D</span>
+            <span className="badge">React / Vanilla</span>
+            <a href="https://www.npmjs.com/package/@dloss/dithered-image" target="_blank" rel="noopener noreferrer" className="badge badge-link">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M0 0v16h16V0H0zm13 13h-2V5H8v8H3V3h10v10z" /></svg>
+              npm
+            </a>
+          </div>
         </div>
 
         <Tabs.Root defaultValue="npm" className="tabs">
-          <Tabs.List className="tabs-list">
+          <div className="tabs-list-scroll"><Tabs.List className="tabs-list">
             {Object.keys(installCommands).map((pm) => (
               <Tabs.Tab key={pm} value={pm} className="tabs-tab">
                 {pm}
               </Tabs.Tab>
             ))}
             <Tabs.Indicator className="tabs-indicator" />
-          </Tabs.List>
+          </Tabs.List></div>
           {Object.entries(installCommands).map(([pm, cmd]) => (
             <Tabs.Panel key={pm} value={pm} className="tabs-panel">
               <code className="install-code">{cmd}</code>
@@ -209,27 +363,24 @@ function App() {
         </Tabs.Root>
 
         <Tabs.Root defaultValue="Component" className="tabs" style={{ marginTop: 32 }}>
-          <Tabs.List className="tabs-list">
+          <div className="tabs-list-scroll"><Tabs.List className="tabs-list">
             {Object.keys(usageExamples).map((label) => (
               <Tabs.Tab key={label} value={label} className="tabs-tab">
                 {label}
               </Tabs.Tab>
             ))}
             <Tabs.Indicator className="tabs-indicator" />
-          </Tabs.List>
+          </Tabs.List></div>
           {Object.entries(usageExamples).map(([label, code]) => (
             <Tabs.Panel key={label} value={label} className="tabs-panel">
               <CodeBlock code={code} />
             </Tabs.Panel>
           ))}
         </Tabs.Root>
-      </section>
 
-      {/* Demos */}
-      <section className="section">
-        <div className="section-header">
-          <h2>Demos</h2>
-          <p>Move your mouse over each canvas. Click for a shockwave.</p>
+        <div style={{ marginTop: 48 }}>
+          <h3 className="subsection-title">Demos</h3>
+          <p className="subsection-desc">Move your mouse over each canvas. Click for a shockwave.</p>
         </div>
         <Tabs.Root
           value={selectedLogo}
@@ -237,7 +388,7 @@ function App() {
           className="tabs"
           style={{ marginBottom: 24 }}
         >
-          <Tabs.List className="tabs-list">
+          <div className="tabs-list-scroll"><Tabs.List className="tabs-list">
             {logoOptions.map((logo, i) => (
               <Tabs.Tab key={logo.label} value={i} className="tabs-tab logo-tab">
                 <img src={logo.src} alt={logo.label} className="logo-tab-icon" />
@@ -245,132 +396,17 @@ function App() {
               </Tabs.Tab>
             ))}
             <Tabs.Indicator className="tabs-indicator" />
-          </Tabs.List>
+          </Tabs.List></div>
         </Tabs.Root>
         <div className="demo-grid">
           {demos.map((demo) => (
-            <div className="demo-card" key={demo.title}>
-              <DitheredImage
-                src={currentSrc}
-                className="demo-canvas-wrap"
-                {...demo.options}
-              />
-              <div className="demo-info">
-                <h3>{demo.title}</h3>
-                <p>{demo.desc}</p>
-              </div>
-            </div>
+            <DemoCard key={`${demo.title}-${selectedLogo}`} demo={demo} src={currentSrc} />
           ))}
         </div>
-      </section>
 
-      {/* Dither Elements */}
-      <section className="section">
-        <div className="section-header">
-          <h2>Dither any element</h2>
-          <p>
-            Use <code>@dloss/dithered-element</code> to dither any React component or DOM element.
-            It rasterizes children automatically using <a href="https://snapdom.dev" target="_blank" rel="noopener noreferrer">snapDOM</a>.
-          </p>
-        </div>
-
-        <Tabs.Root defaultValue="npm" className="tabs">
-          <Tabs.List className="tabs-list">
-            {Object.keys(elementInstallCommands).map((pm) => (
-              <Tabs.Tab key={pm} value={pm} className="tabs-tab">
-                {pm}
-              </Tabs.Tab>
-            ))}
-            <Tabs.Indicator className="tabs-indicator" />
-          </Tabs.List>
-          {Object.entries(elementInstallCommands).map(([pm, cmd]) => (
-            <Tabs.Panel key={pm} value={pm} className="tabs-panel">
-              <code className="install-code">{cmd}</code>
-            </Tabs.Panel>
-          ))}
-        </Tabs.Root>
-
-        <Tabs.Root defaultValue="Basic" className="tabs" style={{ marginTop: 32 }}>
-          <Tabs.List className="tabs-list">
-            {Object.keys(elementUsageExamples).map((label) => (
-              <Tabs.Tab key={label} value={label} className="tabs-tab">
-                {label}
-              </Tabs.Tab>
-            ))}
-            <Tabs.Indicator className="tabs-indicator" />
-          </Tabs.List>
-          {Object.entries(elementUsageExamples).map(([label, code]) => (
-            <Tabs.Panel key={label} value={label} className="tabs-panel">
-              <CodeBlock code={code} />
-            </Tabs.Panel>
-          ))}
-        </Tabs.Root>
-
-        <div className="demo-grid" style={{ marginTop: 32 }}>
-          <div className="demo-card">
-            <Dither className="demo-canvas-wrap" invert gridSize={170}>
-              <div className="dither-demo-content">
-                <div className="dither-demo-icon">D</div>
-                <div className="dither-demo-text">
-                  <strong>dithered-element</strong>
-                  <span>This is a plain HTML element, dithered.</span>
-                </div>
-              </div>
-            </Dither>
-            <div className="demo-info">
-              <h3>HTML element</h3>
-              <p>A styled div wrapped in {"<Dither>"} with invert mode.</p>
-            </div>
-          </div>
-          <div className="demo-card">
-            <Dither className="demo-canvas-wrap" gridSize={200} preserveColors>
-              <div className="dither-demo-content dither-demo-colorful">
-                <div className="dither-demo-gradient" />
-                <div className="dither-demo-text">
-                  <strong>Preserved colors</strong>
-                  <span>Original colors from the element are kept.</span>
-                </div>
-              </div>
-            </Dither>
-            <div className="demo-info">
-              <h3>Color preserved</h3>
-              <p>Element colors carried through to each dot.</p>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ overflowX: "auto", marginTop: 32 }}>
-          <p style={{ fontSize: 14, color: "var(--muted)", marginBottom: 16 }}>
-            All <code>@dloss/dithered-image</code> options are also accepted as props, plus:
-          </p>
-          <table className="api-table">
-            <thead>
-              <tr>
-                <th>Prop</th>
-                <th>Type</th>
-                <th>Default</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {elementApiRows.map(([prop, type, def, desc]) => (
-                <tr key={prop}>
-                  <td><code>{prop}</code></td>
-                  <td><code>{type}</code></td>
-                  <td><code>{def}</code></td>
-                  <td>{desc}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* API */}
-      <section className="section">
-        <div className="section-header">
-          <h2>Options</h2>
-          <p>Works with zero config. Tune these to dial in the exact feel you want.</p>
+        <div style={{ marginTop: 48 }}>
+          <h3 className="subsection-title">Options</h3>
+          <p className="subsection-desc">Works with zero config. Tune these to dial in the exact feel you want.</p>
         </div>
         <div style={{ overflowX: "auto" }}>
           <table className="api-table">
@@ -384,6 +420,92 @@ function App() {
             </thead>
             <tbody>
               {apiRows.map(([prop, type, def, desc]) => (
+                <tr key={prop}>
+                  <td><code>{prop}</code></td>
+                  <td><code>{type}</code></td>
+                  <td><code>{def}</code></td>
+                  <td>{desc}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* ── @dloss/dithered-element ── */}
+      <section className="section">
+        <div className="section-header">
+          <h2>@dloss/dithered-element</h2>
+          <p>
+            Dither any React component or DOM element.
+            Rasterizes children automatically using <a href="https://snapdom.dev" target="_blank" rel="noopener noreferrer">snapDOM</a>.
+          </p>
+          <div className="section-badges">
+            <span className="badge">~1 KB gzipped</span>
+            <span className="badge">React</span>
+            <a href="https://www.npmjs.com/package/@dloss/dithered-element" target="_blank" rel="noopener noreferrer" className="badge badge-link">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M0 0v16h16V0H0zm13 13h-2V5H8v8H3V3h10v10z" /></svg>
+              npm
+            </a>
+          </div>
+        </div>
+
+        <Tabs.Root defaultValue="npm" className="tabs">
+          <div className="tabs-list-scroll"><Tabs.List className="tabs-list">
+            {Object.keys(elementInstallCommands).map((pm) => (
+              <Tabs.Tab key={pm} value={pm} className="tabs-tab">
+                {pm}
+              </Tabs.Tab>
+            ))}
+            <Tabs.Indicator className="tabs-indicator" />
+          </Tabs.List></div>
+          {Object.entries(elementInstallCommands).map(([pm, cmd]) => (
+            <Tabs.Panel key={pm} value={pm} className="tabs-panel">
+              <code className="install-code">{cmd}</code>
+            </Tabs.Panel>
+          ))}
+        </Tabs.Root>
+
+        <Tabs.Root defaultValue="Basic" className="tabs" style={{ marginTop: 32 }}>
+          <div className="tabs-list-scroll"><Tabs.List className="tabs-list">
+            {Object.keys(elementUsageExamples).map((label) => (
+              <Tabs.Tab key={label} value={label} className="tabs-tab">
+                {label}
+              </Tabs.Tab>
+            ))}
+            <Tabs.Indicator className="tabs-indicator" />
+          </Tabs.List></div>
+          {Object.entries(elementUsageExamples).map(([label, code]) => (
+            <Tabs.Panel key={label} value={label} className="tabs-panel">
+              <CodeBlock code={code} />
+            </Tabs.Panel>
+          ))}
+        </Tabs.Root>
+
+        <div className="demo-grid" style={{ marginTop: 32 }}>
+          {elementDemos.map((demo) => (
+            <ElementDemoCard key={demo.title} demo={demo} />
+          ))}
+        </div>
+
+        <div style={{ marginTop: 48 }}>
+          <h3 className="subsection-title">Additional props</h3>
+          <p className="subsection-desc">
+            All <code>@dloss/dithered-image</code> options above are also accepted, plus:
+          </p>
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table className="api-table">
+            <thead>
+              <tr>
+                <th>Prop</th>
+                <th>Type</th>
+                <th>Default</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {elementApiRows.map(([prop, type, def, desc]) => (
                 <tr key={prop}>
                   <td><code>{prop}</code></td>
                   <td><code>{type}</code></td>
