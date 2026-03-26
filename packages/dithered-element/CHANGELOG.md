@@ -1,5 +1,11 @@
 # @dloss/dithered-element
 
+## 1.0.2
+
+### Patch Changes
+
+- c93db2b: Fix workspace:\* protocol not being replaced with real version ranges during publish. Migrated from bun to pnpm which handles this correctly.
+
 ## 1.0.1
 
 ### Patch Changes

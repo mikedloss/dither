@@ -1,5 +1,11 @@
 # @dloss/dithered-image
 
+## 1.0.4
+
+### Patch Changes
+
+- c93db2b: Fix workspace:\* protocol not being replaced with real version ranges during publish. Migrated from bun to pnpm which handles this correctly.
+
 ## 1.0.3
 
 ### Patch Changes
