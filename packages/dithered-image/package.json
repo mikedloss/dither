@@ -1,0 +1,42 @@
+{
+  "name": "@md/dithered-image",
+  "version": "0.0.1",
+  "type": "module",
+  "license": "MIT",
+  "description": "Interactive dithered image effect for the web — cursor repulsion and click shockwaves",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": ["dist", "README.md"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "react": "^19.2.4",
+    "tsup": "^8.5.0"
+  },
+  "keywords": ["dither", "dithered", "stipple", "dots", "canvas", "interactive", "react", "effect"]
+}
