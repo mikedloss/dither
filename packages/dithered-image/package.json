@@ -1,17 +1,17 @@
 {
-  "name": "@md/dithered-image",
+  "name": "@dloss/dithered-image",
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
   "description": "Interactive dithered image effect for the web - cursor repulsion and click shockwaves",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       },
       "require": {
         "types": "./dist/index.d.cts",
@@ -20,8 +20,8 @@
     },
     "./vanilla": {
       "import": {
-        "types": "./dist/vanilla.d.ts",
-        "default": "./dist/vanilla.js"
+        "types": "./dist/vanilla.d.mts",
+        "default": "./dist/vanilla.mjs"
       },
       "require": {
         "types": "./dist/vanilla.d.cts",
@@ -30,8 +30,8 @@
     },
     "./react": {
       "import": {
-        "types": "./dist/react.d.ts",
-        "default": "./dist/react.js"
+        "types": "./dist/react.d.mts",
+        "default": "./dist/react.mjs"
       },
       "require": {
         "types": "./dist/react.d.cts",
@@ -42,8 +42,8 @@
   "files": ["dist", "README.md"],
   "sideEffects": false,
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch"
+    "build": "tsdown",
+    "dev": "tsdown --watch"
   },
   "peerDependencies": {
     "react": ">=18"
@@ -56,7 +56,7 @@
   "devDependencies": {
     "@types/react": "^19.2.14",
     "react": "^19.2.4",
-    "tsup": "^8.5.0"
+    "tsdown": "^0.21.5"
   },
   "keywords": ["dither", "dithered", "stipple", "dots", "canvas", "interactive", "react", "effect"]
 }
